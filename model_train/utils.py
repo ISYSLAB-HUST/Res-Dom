@@ -23,8 +23,6 @@ def read_pssm(chain):
 
 
 def load_ss_rsa_fea(chain):
-    # 读取后五维fea
-    # /home/haolinz/workspace/esm-dnndom/workspace/train_fea/2o6pA/2o6pA.fea 
     """
     param: chain  -- name of pdb chain
     func: read last 5 dimension vector from chain.fea    (secondary structure and relative solvent accessibility )

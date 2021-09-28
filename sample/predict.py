@@ -131,7 +131,7 @@ def data(chain, data_path):
     fn = os.path.join(data_path, chain, chain+".pt")
     embs = torch.load(fn)
     esm_feature_arr = np.array(embs['representations'][EMB_LAYER])
-    # 标准化
+    # normlization
     hmm_norm_arr = (hmm_arr-hmm_mean)/hmm_std
     ss_arr = load_ss(chain, data_path)
     rsa_arr = load_rsa(chain, data_path)
@@ -140,7 +140,6 @@ def data(chain, data_path):
     combine_feature_arr = combine_feature_arr.reshape(1, combine_feature_arr.shape[0], combine_feature_arr.shape[1])
     combine_feature_arr = pad_sequences(combine_feature_arr, MAX_LEN, dtype="float32", padding='post', truncating='post')
     x1_test = combine_feature_arr
-    # 样本重复一个（针对单个样本多个样本时不需要）
     x1_test = np.concatenate((x1_test, combine_feature_arr), axis=0)
     return x1_test
 
@@ -156,16 +155,13 @@ from keras import regularizers
 
 def predict_dom(score, threshold=0.5, min_len=10):
     merge_dom_len = 40
-    # 1.find under_threshold continuous region
+    # find under_threshold continuous region
     under_threshold_ls = np.where(score < threshold)[0]
     if under_threshold_ls == []:
         return []
     block_ls = to_block(under_threshold_ls[:])
-    # print(block_ls)
-    # 2.去除长度小于10的区域
     block_filter_ls = [x for x in block_ls if len(x)>min_len]
-    # print("filter: ", block_filter_ls)
-    # 3.merge region
+    # merge region
     predict_boundary_ls = [x[len(x)//2] for x in block_filter_ls]
     if len(predict_boundary_ls) == 1:
         return predict_boundary_ls
@@ -215,7 +211,7 @@ if __name__ == "__main__":
     # model =multi_gpu_model(model, gpus=2)    
     model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.0001),metrics=['accuracy',precision, sensitivity, f1_score])
     preds=model.predict(x_test)
-    # 训练模型的时候使用的并行模式，运行的时候只有一个样本会报错，因此重复一次。
+    # The parallel mode was used when training the model.
     chain_ls = [chain, chain]
     for ind, chain in enumerate(chain_ls):
         scorepath = os.path.join(file_path, chain, chain+'.score')
@@ -230,7 +226,7 @@ if __name__ == "__main__":
         score = score[:l]
         np.savetxt(scorepath, score)
         predict_boundary_ls = predict_dom(score, 0.5, 20)
-        # 返回预测结果
+        # return predicted result
         dom_num = len(predict_boundary_ls)+1
         dom_ls = []
         dom_str = ""

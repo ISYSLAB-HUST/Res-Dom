@@ -23,20 +23,18 @@ config = tf.ConfigProto(allow_soft_placement=True)
 config.gpu_options.allow_growth = True
 set_session(tf.Session(config=config))
 
-seq_length = 700    # 700 改成最大长度
+seq_length = 700
 
 
 def sensitivity(y_true, y_pred):
-	true_label = K.argmax(y_true, axis=-1)    # 在给定轴上求张量之最大元素下标
+	true_label = K.argmax(y_true, axis=-1)
 	pred_label = K.argmax(y_pred, axis=-1)
 	INTERESTING_CLASS_ID = 2
-	# equal/not_equal 逐元素判不/相等关系，返回布尔张量
-	# cast改变张量的数据类型
-	sample_mask = K.cast(K.not_equal(true_label, INTERESTING_CLASS_ID), 'int32')    # [1,1,1,1,0,0,0] padding区域都是0
+	sample_mask = K.cast(K.not_equal(true_label, INTERESTING_CLASS_ID), 'int32')
 
-	TP_tmp1 = K.cast(K.equal(true_label, 0), 'int32') * sample_mask    # true_label的boundary区域 * sample_mask
-	TP_tmp2 = K.cast(K.equal(pred_label, 0), 'int32') * sample_mask    # pred_label的boundary区域 * sample_mask
-	TP = K.sum(TP_tmp1 * TP_tmp2)    # TP
+	TP_tmp1 = K.cast(K.equal(true_label, 0), 'int32') * sample_mask
+	TP_tmp2 = K.cast(K.equal(pred_label, 0), 'int32') * sample_mask
+	TP = K.sum(TP_tmp1 * TP_tmp2)
 
 	FN_tmp1 = K.cast(K.equal(true_label, 0), 'int32') * sample_mask
 	FN_tmp2 = K.cast(K.not_equal(pred_label, 0), 'int32') * sample_mask   
@@ -128,12 +126,6 @@ def parse_history(history_dict):
 
 
 def data(data_path):
-	"""
-	param:
-		data_path: 数据路径
-	func:
-	return:
-	"""
 	x1_train = np.load(os.path.join(data_path, "x1_all.npy"))
 	y_train = np.load(os.path.join(data_path, "y_all.npy"))
 	print("x1_train: ", x1_train.shape)
@@ -158,7 +150,7 @@ class ResNet:
 		"""
 		param: x: The input to the residual module.
 			   filters: The number of the filters that will be learned by the final CONV in the bottlenecks.最终卷积层的输出
-			   kernel_size: 一个整数，或者单个整数表示的元组或列表， 指明 1D 卷积窗口的长度
+			   kernel_size: 64
 		return:
 			   x: Return the output of the residual module
 		"""
@@ -181,7 +173,7 @@ class ResNet:
 			shortcut = x
 		else:
 			shortcut = Conv1D(filters, kernel_size, padding="same", use_bias=False,
-							   kernel_regularizer=regularizers.l1_l2(reg))(x)  # 输入输出维度不同，所以short_cut需要经过一层变换
+							   kernel_regularizer=regularizers.l1_l2(reg))(x)
 			shortcut = BatchNormalization(scale=False, center=True)(shortcut)
 
 		x = add([shortcut, conv2])
@@ -198,11 +190,11 @@ class ResNet:
 		reg = 0.001
 		x = BatchNormalization()(input)
 		for i in range(0, len(stages)):
-			for j in range(0, stages[i]):  # 每层的遍历
+			for j in range(0, stages[i]):
 				# Apply a residual module.
 				x = ResNet.residual_module(x, filters_ls[i], kernal_size_ls[i], reg)
 
-		hidden_units = 512  # 128
+		hidden_units = 512
 		lstm_1 = Bidirectional(LSTM(hidden_units, return_sequences=True), merge_mode="sum")(x)
 		lstm_1 = BatchNormalization()(lstm_1)
 		dense_1 = TimeDistributed(Dense(512, kernel_regularizer=regularizers.l2(0.001)))(lstm_1)
@@ -220,7 +212,7 @@ class ResNet:
 
 def train_model(X1_train, Y_train):
 	"""
-	训练Res-Dom
+	train Res-Dom
 	"""
 	from keras.optimizers import SGD, RMSprop, Adam
 	from keras.utils import multi_gpu_model
@@ -232,19 +224,15 @@ def train_model(X1_train, Y_train):
 	saveBestModel = ModelCheckpoint(savepath, monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=True,
 										mode='min')
 	cb = [early_stopping, saveBestModel]
-
-	# Parall = 0
 	batch_size = 256
-	# parallel
 	model = multi_gpu_model(model, gpus=2)
 	model.compile(loss='categorical_crossentropy',
 					optimizer=Adam(lr=0.0001),
-					metrics=['accuracy', precision, sensitivity, f1_score]) #sample_weight_mode='temporal'
+					metrics=['accuracy', precision, sensitivity, f1_score])
 	history = model.fit(X1_train, Y_train, batch_size=256, epochs=200,
 						validation_split=0.2, shuffle = True, callbacks=cb,
 						verbose=1)
 
-	# print(history.epoch, history.history)
 	# plot loss curve
 	parse_history(history.history)
 	png_name = "Res-Dom_model_train"
