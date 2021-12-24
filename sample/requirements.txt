@@ -1,7 +1,0 @@
-Package                Version             
----------------------- --------------------
-esm                    0.1.0               
-Keras                  2.2.0               
-numpy                  1.19.1              
-tensorflow-gpu         1.8.0               
-torch                  1.6.0               
