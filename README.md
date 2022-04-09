@@ -2,7 +2,7 @@
 predict protein domain boundary from sequence alone using deep residual network and Bi-LSTM
 
 
-### required tools
+### Required tools
 
     Package                Version             
     ---------------------- --------------------
@@ -11,20 +11,32 @@ predict protein domain boundary from sequence alone using deep residual network 
     numpy                  1.19.1              
     tensorflow-gpu         1.8.0               
     torch                  1.6.0               
+### Dataset
 
-### run code to predict sample sequence
+The training data was collected from [CATH(V4.1)](https://www.cathdb.info/wiki?id=data:index) and the independent testing datasets were derived from the [CATH(V4.3)](https://www.cathdb.info/wiki?id=data:index).
 
-    cd sample/
-    python predict.py
+### Test 
 
+```
+cd sample/
+python predict.py
+```
 
-### the trained models
+### The trained models
     
-   model file: sample/res-dom.h5
+`model file: sample/res-dom.h5`
 
-### the training scripts
+### The training scripts
 
-script file for training deep learning model: model_train/model_train.py(the training data path should change to your own) the training data was collected from CATH(V4.1) and the independent testing datasets were derived from the CATH (V4.3)
+Scripts for training deep learning model: 
+
+```
+model_train/model_train.py
+```
+* Note: the training data path should change to your local path. 
+
+### License
+[MIT](LICENSE)
 
 ### Contact
 
