@@ -1,37 +1,39 @@
-## Welcome to GitHub Pages
+## Welcome to Res-Dom
 
-You can use the [editor on GitHub](https://github.com/ISYSLAB-HUST/Res-Dom/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Res-Dom: predict protein domain boundary from sequence alone using deep residual network and Bi-LSTM.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Required tools
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
 ```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+Package                Version             
+---------------------- --------------------
+esm                    0.1.0               
+Keras                  2.2.0               
+numpy                  1.19.1              
+tensorflow-gpu         1.8.0               
+torch                  1.6.0 
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
 
-### Jekyll Themes
+### Dataset
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/ISYSLAB-HUST/Res-Dom/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+The training data was collected from CATH(V4.1) and the independent testing datasets were derived from the CATH(V4.3).
+
+### The training scripts
+
+```markdown
+python ./model_train/model_train.py
+```
+Note: the training data path should change to your local path.
+
+### The test script
+
+```markdown
+cd sample/
+python predict.py
+```
 
 ### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+If you have any questions, comments, or would like to report a bug, please file a Github issue or contact me at 1762276284@qq.com.
