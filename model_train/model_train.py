@@ -17,6 +17,7 @@ import keras
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from keras import backend as K
+from sklearn.utils import class_weight
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
 config = tf.ConfigProto(allow_soft_placement=True)
@@ -226,12 +227,13 @@ def train_model(X1_train, Y_train):
 	cb = [early_stopping, saveBestModel]
 	batch_size = 256
 	model = multi_gpu_model(model, gpus=2)
+	class_weights = class_weight.compute_class_weight('balanced', np.unique(Y_train), Y_train)
 	model.compile(loss='categorical_crossentropy',
 					optimizer=Adam(lr=0.0001),
 					metrics=['accuracy', precision, sensitivity, f1_score])
 	history = model.fit(X1_train, Y_train, batch_size=256, epochs=200,
 						validation_split=0.2, shuffle = True, callbacks=cb,
-						verbose=1)
+						verbose=1, class_weight=class_weights)
 
 	# plot loss curve
 	parse_history(history.history)

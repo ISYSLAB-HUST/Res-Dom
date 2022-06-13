@@ -10,7 +10,8 @@ predict protein domain boundary from sequence alone using deep residual network 
     Keras                  2.2.0               
     numpy                  1.19.1              
     tensorflow-gpu         1.8.0               
-    torch                  1.6.0               
+    torch                  1.6.0   
+    scikit-learn           1.0.0            
 ### Dataset
 
 The training data was collected from [CATH(V4.1)](https://www.cathdb.info/wiki?id=data:index) and the independent testing datasets were derived from the [CATH(V4.3)](https://www.cathdb.info/wiki?id=data:index).
